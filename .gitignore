@@ -249,7 +249,8 @@ web_modules/
 
 # Next.js build output
 .next
-out
+io/out/*
+io/in/*
 
 # Nuxt.js build / generate output
 .nuxt

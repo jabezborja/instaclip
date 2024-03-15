@@ -1,6 +1,6 @@
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-def filtered_to_video(transcription):
+def filtered_to_video(transcription, video_file):
     
     clips = []
 
@@ -9,7 +9,7 @@ def filtered_to_video(transcription):
         start = float(transcribe['start'])
         end = float(transcribe['end'])
 
-        clip = VideoFileClip('out/video.mp4').subclip(start, end)
+        clip = VideoFileClip(video_file).subclip(start, end)
 
         clips.append(clip)
 
@@ -20,7 +20,7 @@ def filtered_to_video(transcription):
     width = int((height / aspect_ratio[1]) * aspect_ratio[0])
 
     final_clip = concatenate_videoclips(clips).resize(width=width, height=height)
-    final_clip.write_videofile('out/new_video.mp4')
+    final_clip.write_videofile('io/out/new_video.mp4')
 
     for clip in clips:
         clip.close()

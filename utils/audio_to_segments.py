@@ -1,7 +1,7 @@
 
-def audio_to_segments(client):
+def audio_to_segments(client, audio_file):
     
-    audio_file= open("out/audio.mp3", "rb")
+    audio_file= open(audio_file, "rb")
     transcription = client.audio.transcriptions.create(
         model="whisper-1", 
         response_format='verbose_json',
