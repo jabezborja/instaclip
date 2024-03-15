@@ -1,6 +1,6 @@
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-def filtered_to_video(transcription, video_file):
+def filtered_to_video(transcription, video_file, filename):
     
     clips = []
 
@@ -19,10 +19,14 @@ def filtered_to_video(transcription, video_file):
     aspect_ratio = (9, 16)
     width = int((height / aspect_ratio[1]) * aspect_ratio[0])
 
+    out_path = f"io/out/{filename}.mp4"
+
     final_clip = concatenate_videoclips(clips).resize(width=width, height=height)
-    final_clip.write_videofile('io/out/new_video.mp4')
+    final_clip.write_videofile(out_path)
 
     for clip in clips:
         clip.close()
 
     final_clip.close()
+
+    return out_path

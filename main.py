@@ -22,7 +22,7 @@ client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
 )
 
-@app.route('/upload_video', methods=['POST'])
+@app.route('/video_upload', methods=['POST'])
 def upload_video():
 
     if not 'file' in request.files:
@@ -59,25 +59,29 @@ def video_segmentation():
 
     return segments
 
-@app.route('/video', methods=['POST'])
-def main():
-
-    filepath = request.form.get('video_filepath')
+@app.route('/video_filtering', methods=['POST'])
+def video_filtering():
     segments = request.form.get('segments')
+    transcription = segments_to_filtered(client, segments)
+    filtered = jsonify(transcription)
+    
+    return filtered
 
-    def stream():
+@app.route('/video_export', methods=['POST'])
+def video_export():
+    filepath = request.form.get('video_filepath')
+    transcription = request.form.get('transcription')
+    transcription = json.loads(transcription)
 
-        yield "identifying"
+    out = filtered_to_video(transcription, filepath, "new_video")
 
-        transcription = segments_to_filtered(client, segments)
-
-        yield "exporting"
-
-        filtered_to_video(transcription, filepath)
-
-        yield "success"
-
-    return app.response_class(stream(), mimetype='text/plain')
+    return jsonify({
+        "message": "File exported successfully",
+        "success": True,
+        "details": {
+            "path": out
+        }
+    })
 
 if __name__ == '__main__':
-    main()
+    app.run(host=5000)
