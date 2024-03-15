@@ -51,20 +51,25 @@ def upload_video():
         }
     }), 200
 
+@app.route('/video_segmentation', methods=['POST'])
+def video_segmentation():
+    filepath = request.form.get('video_filepath')
+    transcription = audio_to_segments(client, filepath)
+    segments = jsonify(transcription.segments)
+
+    return segments
+
 @app.route('/video', methods=['POST'])
 def main():
 
     filepath = request.form.get('video_filepath')
+    segments = request.form.get('segments')
 
     def stream():
 
-        yield "segmenting"
-
-        transcription = audio_to_segments(client, filepath)
-
         yield "identifying"
 
-        transcription = segments_to_filtered(client, transcription)
+        transcription = segments_to_filtered(client, segments)
 
         yield "exporting"
 

@@ -1,6 +1,6 @@
 import json
 
-def segments_to_filtered(client, transcription):
+def segments_to_filtered(client, segments):
     
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
@@ -12,7 +12,7 @@ def segments_to_filtered(client, transcription):
             {"role": "system", "content": "Now, choose one best topic"},
             {"role": "system", "content": "Now, get that best topic and create a 30-second short-form content based on the transcription."},
             {"role": "system", "content": "Please return a JSON object where 'discussion' are array of discussion in the best topic on a 30-second short-form content, inside the important array of discussion, there must be a JSON for every discussion, where in there 'text' is the keynote; where 'start' is the video timestamp start; where 'end' is the video timestamp end"},
-            {"role": "user", "content": json.dumps(transcription.segments)}
+            {"role": "user", "content": segments}
         ]
     )
 
