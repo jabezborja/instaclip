@@ -1,9 +1,7 @@
 import json
 
 def segments_to_filtered(client, transcription):
-
-    print("Identifying key elements...")
-
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         response_format={ "type": "json_object" },
