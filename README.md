@@ -50,6 +50,17 @@ Launch Instaclip:
 flask --app main run
 ```
 
+*Note: The frontend is still implementing so you can use the API endpoint with POSTMAN for now.*
+
+To generate a short-form content. You must call
+
+```
+/video/upload -> uploads the videos and turns it into listenable mp3 for Whisper
+/video/segmentation -> you pass the video_filepath from /video/upload, this returns segmented and processed transcription
+/video/segment_candidates -> you pass the processed segmented and transcription, this returns the video candidates - best possible content
+/video/export -> you pass the video_filepath and candidates, this returns the output path of the videos, this is now the short-form content generated.
+```
+
 ## Contributing
 We welcome contributions to Instaclip. To contribute, please follow these guidelines:
 
