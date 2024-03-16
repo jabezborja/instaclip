@@ -1,28 +1,20 @@
 import os
 import json
 
+from . import api
+from flask import jsonify, request
 from openai import OpenAI
-from flask import Flask, request, jsonify
-
-from dotenv import load_dotenv
-from moviepy.config import change_settings
 
 from utils.video_to_audio import convert_video_to_audio
 from utils.audio_to_segments import audio_to_segments
 from utils.segments_to_candidates import segments_to_candidates
 from utils.candidates_to_video import segment_candidates
 
-load_dotenv()
-change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16-HDRI\\magick.exe"})
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'io/in'
-
 client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
 )
 
-@app.route('/video/upload', methods=['POST'])
+@api.route('/video/upload', methods=['POST'])
 def upload_video():
 
     if not 'file' in request.files:
@@ -37,7 +29,7 @@ def upload_video():
         return jsonify({"message": f"File not found", "success": False}), 400
 
     filename = file.filename
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join('io/in', filename)
 
     file.save(filepath)
 
@@ -51,7 +43,7 @@ def upload_video():
         }
     }), 200
 
-@app.route('/video/segmentation', methods=['POST'])
+@api.route('/video/segmentation', methods=['POST'])
 def video_segmentation():
     filepath = request.form.get('video_filepath')
     transcription = audio_to_segments(client, filepath)
@@ -59,7 +51,7 @@ def video_segmentation():
 
     return segments
 
-@app.route('/video/segment_candidates', methods=['POST'])
+@api.route('/video/segment_candidates', methods=['POST'])
 def video_segment_candidates():
     segments = request.form.get('segments')
     transcription = segments_to_candidates(client, segments)
@@ -67,7 +59,7 @@ def video_segment_candidates():
     
     return candidates
 
-@app.route('/video/export', methods=['POST'])
+@api.route('/video/export', methods=['POST'])
 def video_export():
     filepath = request.form.get('video_filepath')
     candidates = request.form.get('candidates')
@@ -82,6 +74,3 @@ def video_export():
             "paths": video_candidates_path
         }
     })
-
-if __name__ == '__main__':
-    app.run(host=5000)
