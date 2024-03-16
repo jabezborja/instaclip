@@ -9,8 +9,8 @@ from moviepy.config import change_settings
 
 from utils.video_to_audio import convert_video_to_audio
 from utils.audio_to_segments import audio_to_segments
-from utils.segments_to_filtered import segments_to_filtered
-from utils.filtered_to_video import filtered_to_video
+from utils.segments_to_candidates import segments_to_candidates
+from utils.candidates_to_video import segment_candidates
 
 load_dotenv()
 change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16-HDRI\\magick.exe"})
@@ -22,7 +22,7 @@ client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
 )
 
-@app.route('/video_upload', methods=['POST'])
+@app.route('/video/upload', methods=['POST'])
 def upload_video():
 
     if not 'file' in request.files:
@@ -51,7 +51,7 @@ def upload_video():
         }
     }), 200
 
-@app.route('/video_segmentation', methods=['POST'])
+@app.route('/video/segmentation', methods=['POST'])
 def video_segmentation():
     filepath = request.form.get('video_filepath')
     transcription = audio_to_segments(client, filepath)
@@ -59,27 +59,27 @@ def video_segmentation():
 
     return segments
 
-@app.route('/video_filtering', methods=['POST'])
-def video_filtering():
+@app.route('/video/segment_candidates', methods=['POST'])
+def video_segment_candidates():
     segments = request.form.get('segments')
-    transcription = segments_to_filtered(client, segments)
-    filtered = jsonify(transcription)
+    transcription = segments_to_candidates(client, segments)
+    candidates = jsonify(transcription)
     
-    return filtered
+    return candidates
 
-@app.route('/video_export', methods=['POST'])
+@app.route('/video/export', methods=['POST'])
 def video_export():
     filepath = request.form.get('video_filepath')
-    transcription = request.form.get('transcription')
-    transcription = json.loads(transcription)
+    candidates = request.form.get('candidates')
+    candidates = json.loads(candidates)
 
-    out = filtered_to_video(transcription, filepath, "new_video")
+    video_candidates_path = segment_candidates(candidates, filepath, "new_video")
 
     return jsonify({
         "message": "File exported successfully",
         "success": True,
         "details": {
-            "path": out
+            "paths": video_candidates_path
         }
     })
 
