@@ -10,6 +10,8 @@ from utils.audio_to_segments import audio_to_segments
 from utils.segments_to_candidates import segments_to_candidates
 from utils.candidates_to_video import segment_candidates
 
+from utils.firebase import upload_video_to_db
+
 client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
 )
@@ -31,15 +33,14 @@ def upload_video():
     filename = file.filename
     filepath = os.path.join('io/in', filename)
 
-    file.save(filepath)
-
-    convert_video_to_audio(filepath, filename)
+    audiopath = convert_video_to_audio(filepath, filename)
+    locations = upload_video_to_db(filepath, audiopath)
 
     return jsonify({
         "message": "File uploaded successfully!",
         "success": True,
         "details": {
-            "path": filepath
+            "paths": locations
         }
     }), 200
 
