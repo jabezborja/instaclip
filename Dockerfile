@@ -1,6 +1,6 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /instaclip
+WORKDIR /instaclip-backend
 
 COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
